@@ -57,6 +57,9 @@ class Employee:
 			day = Day(d)
 			self.freeDays.append(d)
 
+	def __repr__(self):
+		return '{} {}'.format(self.name, self.surname)
+
 
 class Day:
 	def __init__(self, num, month, year):
@@ -64,6 +67,7 @@ class Day:
 		self.num = num
 		self.month = month
 		self.year = year
+		self.needed_crew = 2
 
 	def __repr__(self):
 		return '{0}.{1}.{2}'.format(self.num, self.month, self.year)
@@ -77,9 +81,9 @@ class Work:
 
 	def __repr__(self):
 		table = ''
-		print('ID\tName\tSurname\t  Number of days')
+		print('ID\tName\tSurname\t  Working days\tFree days')
 		for employee in self.employees:
-			table += '| {0}. | {1} {2} | {3} |'.format(employee.id, employee.name, employee.surname, len(employee.workDays))
+			table += '| {0}. | {1} {2} | {3} | {4} |'.format(employee.id, employee.name, employee.surname, len(employee.workDays), len(employee.freeDays))
 			table += '\n'
 		return table
 
@@ -88,11 +92,24 @@ class Work:
 			self.employees.append(e)
 
 	def generate_work_schedule(self, month, year):
-		self.days = [i for i in range(1, clnd.monthrange(year, month)[1]+1)]
+		self.days = [Day(i, month, year) for i in range(1, clnd.monthrange(year, month)[1]+1)]
 		for day in self.days:
-			num_empl = randint(0, len(self.employees)-1)
-			self.employees[num_empl].workDays.append(day)
-			self.schedule[day] = "{0} {1}".format(self.employees[num_empl].name, self.employees[num_empl].surname)
+			day_list = []
+			i = 0
+			while i < day.needed_crew:
+			#for i in range(day.needed_crew):
+				num_empl = randint(0, len(self.employees)-1)
+				if self.employees[num_empl] not in day_list:
+					self.employees[num_empl].workDays.append(day)
+					for em in self.employees:
+						if em != self.employees[num_empl]:
+							em.freeDays.append(day)
+					day_list.append(self.employees[num_empl])
+					self.schedule[day] = day_list
+				else:
+					i = i - 1
+
+				i = i + 1
 
 		return self.schedule
 
