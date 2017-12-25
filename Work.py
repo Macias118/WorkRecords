@@ -1,9 +1,28 @@
 import calendar as clnd
 import datetime
-# defIne globals
+from random import randint
+
+#
+# define globals
+#
 NUMBER_OF_EMPLOYEES = 0
 EMPLOYEES_PER_DAY = 4
 HOURS_IN_MONTH = 160
+
+MONTH_NUMBERING = {
+	0 : "January",
+	1 : "February",
+	2 : "March",
+	3 : "April",
+	4 : "May",
+	5 : "June", 
+	6 : "July",
+	7 : "August",
+	8 : "September",
+	9 : "October",
+	10 : "November", 
+	11 : "December"
+}
 
 '''
 class Calendar:
@@ -54,11 +73,13 @@ class Work:
 	def __init__(self):
 		self.employees = []
 		self.days = []
+		self.schedule = {}
 
 	def __repr__(self):
 		table = ''
+		print('ID\tName\tSurname\t  Number of days')
 		for employee in self.employees:
-			table += '| {0}. | {1} {2} |'.format(employee.id, employee.name, employee.surname)
+			table += '| {0}. | {1} {2} | {3} |'.format(employee.id, employee.name, employee.surname, len(employee.workDays))
 			table += '\n'
 		return table
 
@@ -67,7 +88,16 @@ class Work:
 			self.employees.append(e)
 
 	def generate_work_schedule(self, month, year):
-		return [i for i in range(1, clnd.monthrange(year, month)[1]+1)]
+		self.days = [i for i in range(1, clnd.monthrange(year, month)[1]+1)]
+		for day in self.days:
+			num_empl = randint(0, len(self.employees)-1)
+			self.employees[num_empl].workDays.append(day)
+			self.schedule[day] = "{0} {1}".format(self.employees[num_empl].name, self.employees[num_empl].surname)
+
+		return self.schedule
+
+	def assign_day_to_employee(self, empl, day):
+		empl.workDays.append(day)
 
 	'''
 	def generate_work_schedule(self, month, year):
@@ -90,10 +120,13 @@ def mainWork():
 	a = Employee('Tomasz', 'Szczadomiski')
 	p = Employee('Jan', 'Stamtond')
 
+	current_month = 11
+
 	work.add_employee(x, a, p)
 
-	print work.generate_work_schedule(12, 2017)
-
+	print MONTH_NUMBERING[current_month]
+	schedule = work.generate_work_schedule(current_month, 2017)
+	print("\n".join("{}: {}".format(k, v) for k, v in schedule.items()))
 	print(work)
 
 mainWork()
