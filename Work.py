@@ -70,7 +70,7 @@ class Day:
 		self.needed_crew = 2
 
 	def __repr__(self):
-		return '{0}.{1}.{2}'.format(self.num, self.month, self.year)
+		return '{0}.{1}.{2}'.format(self.num, self.month + 1, self.year)
 
 
 class Work:
@@ -92,7 +92,8 @@ class Work:
 			self.employees.append(e)
 
 	def generate_work_schedule(self, month, year):
-		self.days = [Day(i, month, year) for i in range(1, clnd.monthrange(year, month)[1]+1)]
+		print clnd.monthrange(year, month)[1]+1
+		self.days = [Day(i, month, year) for i in range(1, clnd.monthrange(year, month+1)[1]+1)]
 		for day in self.days:
 			day_list = []
 
@@ -103,6 +104,11 @@ class Work:
 				self.schedule[day] = day_list
 				temp_employees.pop(num_empl)
 				self.employees[num_empl].workDays.append(day)
+
+			for empl in self.employees:
+				if empl not in day_list:
+					empl.freeDays.append(day)
+
 
 		return self.schedule
 
@@ -136,7 +142,7 @@ def mainWork():
 
 	print MONTH_NUMBERING[current_month]
 	schedule = work.generate_work_schedule(current_month, 2017)
-	print("\n".join("{}: {}".format(k, v) for k, v in schedule.items()))
+	print("\n".join("{}: {}".format(k, v) for k, v in sorted(schedule.items())))
 	print(work)
 
 mainWork()
