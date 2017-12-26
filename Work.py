@@ -95,21 +95,14 @@ class Work:
 		self.days = [Day(i, month, year) for i in range(1, clnd.monthrange(year, month)[1]+1)]
 		for day in self.days:
 			day_list = []
-			i = 0
-			while i < day.needed_crew:
-			#for i in range(day.needed_crew):
-				num_empl = randint(0, len(self.employees)-1)
-				if self.employees[num_empl] not in day_list:
-					self.employees[num_empl].workDays.append(day)
-					for em in self.employees:
-						if em != self.employees[num_empl]:
-							em.freeDays.append(day)
-					day_list.append(self.employees[num_empl])
-					self.schedule[day] = day_list
-				else:
-					i = i - 1
 
-				i = i + 1
+			temp_employees = self.employees[:]
+			for i in range(day.needed_crew):
+				num_empl = randint(0, len(temp_employees)-1)
+				day_list.append(temp_employees[num_empl])
+				self.schedule[day] = day_list
+				temp_employees.pop(num_empl)
+				self.employees[num_empl].workDays.append(day)
 
 		return self.schedule
 
