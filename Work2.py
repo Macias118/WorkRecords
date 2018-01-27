@@ -5,6 +5,8 @@ EMPLOYEES_PER_DAY = 4
 HOURS_IN_MONTH = 160
 CURRENT_YEAR = 2018
 EMPLOYEE_ID = 0
+MAX_HOURS_IN_A_ROW = 24
+WORKING_HOURS_PER_DAY = 8
 
 MONTH_NUMBERING = {
 	0 : "January",
@@ -40,10 +42,10 @@ class Employee:
 		self.name = name
 		self.surname = surname
 
+		self.hours_in_a_row = 0
 		self.workDays = []
 		self.freeDays = []
-		global HOURS_IN_MONTH
-		self.hours = HOURS_IN_MONTH
+		self.hours = 0
 
 	def __repr__(self):
 		return '{} {}\n'.format(
@@ -120,15 +122,48 @@ def generate_month_days(month, empl_list):
 		else:
 			pnt_list[i].next = pnt_list[0]
 
-	# printing
-
 	curr_pnt = pnt_list[0]
 	pnt_list = []
-	for i in range(30):
-		print('{}. {}'.format(i, curr_pnt.empl))
-		curr_pnt = curr_pnt.next
 
-	print('pnt_list => {}'.format(pnt_list))
+	for day in month:
+		if len(empl_list) < day.needed_crew:
+			print('Niewystarczajaca ilosc pracownikow... Zatrudnij kogos ziom.')
+			exit()
+		
+		# needed_crew is full
+		while len(day.employees) < day.needed_crew:
+			
+			# if empl in day employees list
+			if curr_pnt.empl in day.employees:
+				curr_pnt = curr_pnt.next
+			# hours in a row
+			if curr_pnt.empl.hours_in_a_row + WORKING_HOURS_PER_DAY > MAX_HOURS_IN_A_ROW:
+				print('Pracownik {} wykorzystal juz dobe pracownicza ziomeczku.'.format(curr_pnt.empl))
+				curr_pnt = curr_pnt.next
+				break
+			
+			# hours in month
+			if curr_pnt.empl.hours + WORKING_HOURS_PER_DAY > HOURS_IN_MONTH:
+				print('Pracownik {} przekroczyl juz limit {} godzin w miesiacu. Daj mu na luz ziom.'.format(curr_pnt.empl, HOURS_IN_MONTH))
+				curr_pnt = curr_pnt.next
+				break
+
+			# if everything is alright
+			day.employees.append(curr_pnt.empl)
+			curr_pnt.empl.hours_in_a_row += WORKING_HOURS_PER_DAY
+			curr_pnt.empl.hours += WORKING_HOURS_PER_DAY
+			curr_pnt.empl.workDays.append(day)
+			
+		for em in empl_list:
+			if em not in day.employees:
+				em.hours_in_a_row = 0
+
+		print('Dodano ziomeczka {}.'.format(curr_pnt.empl))
+		curr_pnt = curr_pnt.next
+		# (later - different working hours, e.g. 2 work changes)
+		# (later - one managing person)
+		# (later - 4th sunday of employee must be free)
+		# (later - 48h in a week)
 
 def main():
 	# create February, which start on Thursday 
@@ -145,10 +180,10 @@ def main():
 	employees = [x,a,p,z,w,o,k]
 	#fill_month_randomly(month, employees)
 	generate_month_days(month, employees)
-	#print(month)
+	print(month)
 
-	#for em in employees:
-	#	print('{}: {}'.format(em.name, len(em.workDays)))
+	for em in employees:
+		print('{}: {}'.format(em.name, len(em.workDays)))
 
 
 main()
