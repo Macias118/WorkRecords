@@ -2,7 +2,7 @@ import random
 
 NUMBER_OF_EMPLOYEES = 0
 EMPLOYEES_PER_DAY = 4
-HOURS_IN_MONTH = 160
+HOURS_IN_MONTH = 168
 CURRENT_YEAR = 2018
 EMPLOYEE_ID = 0
 MAX_HOURS_IN_A_ROW = 24
@@ -136,6 +136,7 @@ def generate_month_days(month, empl_list):
 			# if empl in day employees list
 			if curr_pnt.empl in day.employees:
 				curr_pnt = curr_pnt.next
+
 			# hours in a row
 			if curr_pnt.empl.hours_in_a_row + WORKING_HOURS_PER_DAY > MAX_HOURS_IN_A_ROW:
 				print('Pracownik {} wykorzystal juz dobe pracownicza ziomeczku.'.format(curr_pnt.empl))
@@ -147,6 +148,16 @@ def generate_month_days(month, empl_list):
 				print('Pracownik {} przekroczyl juz limit {} godzin w miesiacu. Daj mu na luz ziom.'.format(curr_pnt.empl, HOURS_IN_MONTH))
 				curr_pnt = curr_pnt.next
 				break
+
+			# check free days of employee
+			n = 0
+			while day.num in curr_pnt.empl.freeDays and n < len(empl_list) - day.needed_crew:
+				n += 1
+				print n
+				print('curr empl => ', curr_pnt.empl.name, curr_pnt.empl.surname)
+				print('day num => ', day.num)
+				print('pnt.empl.freeDays => ', curr_pnt.empl.freeDays)
+				curr_pnt = curr_pnt.next
 
 			# if everything is alright
 			day.employees.append(curr_pnt.empl)
@@ -163,11 +174,11 @@ def generate_month_days(month, empl_list):
 		# (later - different working hours, e.g. 2 work changes)
 		# (later - one managing person)
 		# (later - 4th sunday of employee must be free)
-		# (later - 48h in a week)
+		# (later - 40h in a week)
 
 def main():
 	# create February, which start on Thursday 
-	month = create_month(start=3, month=1)
+	month = create_month(start=3, month=0)
 	
 	x = Employee('Andrzej', 'Wonsz')
 	a = Employee('Tomasz', 'Szczadomiski')
@@ -177,7 +188,23 @@ def main():
 	o = Employee('Kunegunda', 'Orliwierzch')
 	k = Employee('Wieslawa', 'Piszczystrzal')
 
+	# x = Employee('A', 'W')
+	# a = Employee('T', 'S')
+	# p = Employee('J', 'S')
+	# z = Employee('M', 'P')
+	# w = Employee('K', 'P')
+	# o = Employee('K', 'O')
+	# k = Employee('W', 'P')
+
 	employees = [x,a,p,z,w,o,k]
+	x.freeDays = [12,28,4,29,1]
+	a.freeDays = [13,1,5,6,19]
+	p.freeDays = [15,1,7,20,19]
+	z.freeDays = [1,3,25,26,12]
+	w.freeDays = [1,2,6,24,30]
+	o.freeDays = [1,24,20,11,5]
+	k.freeDays = [1,19,27,3,4]
+
 	#fill_month_randomly(month, employees)
 	generate_month_days(month, employees)
 	print(month)
